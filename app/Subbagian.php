@@ -20,4 +20,10 @@ class Subbagian extends Model
     {
         return $this->hasMany(User::class, 'subbag_id', 'id');
     }
+
+    // Relasi untuk menghitung jumlah arsip di subbagian (digunakan oleh Superadmin)
+    public function arsips()
+    {
+        return $this->hasMany(Arsip::class, 'subbag_id', 'id');
+    }
 }

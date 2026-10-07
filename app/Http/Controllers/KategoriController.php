@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Kategori;
 use Illuminate\Http\Request;
+use App\Kategori;
 use Illuminate\Support\Facades\Auth;
+use App\Subbagian;
 
 class KategoriController extends Controller
 {
@@ -15,26 +16,40 @@ class KategoriController extends Controller
     }
 
     // 1. READ: Menampilkan daftar folder milik subbagian admin
-    public function index()
+    public function index(Request $request)
     {
-        $kategoris = Kategori::where('subbag_id', Auth::user()->subbag_id)
-                            ->orderBy('nama_kategori', 'asc')
-                            ->get();
+        $query = Kategori::where('subbag_id', Auth::user()->subbag_id);
         
-        return view('kategori.index', compact('kategoris'));
+        if ($request->filled('search')) {
+            $query->where(function($q) use ($request) {
+                $q->where('nama_kategori', 'like', '%' . $request->search . '%')
+                  ->orWhere('deskripsi', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        $kategoris = $query->orderBy('nama_kategori', 'asc')->get();
+        $subbagians = Subbagian::whereNotNull('kode_klasifikasi')->get();
+        
+        return view('kategori.index', compact('kategoris', 'subbagians'));
     }
 
     // 2. CREATE: Menyimpan folder baru dan mengunci subbag_id-nya
     public function store(Request $request)
     {
         $request->validate([
-            'nama_kategori' => 'required|string|max:255',
+            'kode_klasifikasi' => 'required|string',
+            'angka_kategori' => 'nullable|numeric',
             'deskripsi' => 'nullable|string'
         ]);
 
+        $nama_kategori = $request->kode_klasifikasi;
+        if ($request->kode_klasifikasi !== 'Lainnya') {
+            $nama_kategori .= '.' . $request->angka_kategori;
+        }
+
         Kategori::create([
             'subbag_id' => Auth::user()->subbag_id, // Otomatis mengikuti subbag admin
-            'nama_kategori' => $request->nama_kategori,
+            'nama_kategori' => $nama_kategori,
             'deskripsi' => $request->deskripsi
         ]);
 
@@ -45,15 +60,21 @@ class KategoriController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'nama_kategori' => 'required|string|max:255',
+            'kode_klasifikasi' => 'required|string',
+            'angka_kategori' => 'nullable|numeric',
             'deskripsi' => 'nullable|string'
         ]);
+
+        $nama_kategori = $request->kode_klasifikasi;
+        if ($request->kode_klasifikasi !== 'Lainnya') {
+            $nama_kategori .= '.' . $request->angka_kategori;
+        }
 
         // Cari folder berdasarkan ID, TAPI pastikan itu milik subbagiannya
         $kategori = Kategori::where('subbag_id', Auth::user()->subbag_id)->findOrFail($id);
         
         $kategori->update([
-            'nama_kategori' => $request->nama_kategori,
+            'nama_kategori' => $nama_kategori,
             'deskripsi' => $request->deskripsi
         ]);
 

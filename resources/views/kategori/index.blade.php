@@ -47,6 +47,7 @@
     .modal-body { padding: 30px; }
     .modal-footer { border-top: 1px solid #f1f5f9; padding: 20px 30px; background: #f8fafc; border-radius: 0 0 24px 24px; }
     .form-control-modern { border-radius: 12px; border: 1px solid #cbd5e1; padding: 12px 15px; font-family: 'Poppins'; color: #334155; }
+    select.form-control-modern { height: auto !important; }
     .form-control-modern:focus { border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); outline: none; }
     .dropdown-menu-folder { border-radius: 16px; padding: 8px; min-width: 180px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
 
@@ -112,61 +113,7 @@
 @endif
 
 <div class="dashboard-wrapper">
-    <div class="sidebar">
-        <div class="sidebar-header d-flex align-items-center">
-            @if(isset($app_setting) && $app_setting->logo_aplikasi)
-                <img src="{{ asset('storage/pengaturan/' . $app_setting->logo_aplikasi) }}" alt="Logo" class="mr-3" style="width: 48px; height: 48px; object-fit: contain; background: transparent; filter: drop-shadow(0 0 12px rgba(96, 165, 250, 0.7));">
-            @else
-                <div class="bg-primary text-white mr-3 shadow-lg" style="width: 48px; height: 48px; font-size: 1.2rem; border-radius: 14px; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-boxes-stacked"></i></div>
-            @endif
-            
-            <div>
-                <h5 class="mb-0 font-weight-bold" style="font-size: 1.15rem; letter-spacing: 0.5px; background: linear-gradient(to right, #60a5fa, #ffffff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(96, 165, 250, 0.1);">
-                    {{ isset($app_setting) ? $app_setting->nama_aplikasi : 'SIKANTI' }}
-                </h5>
-                <small style="color: #94a3b8; font-size: 0.6rem; display: block; line-height: 1.3; margin-top: 2px; font-weight: 500; letter-spacing: 0.5px;">
-                    {{ isset($app_setting) && $app_setting->sub_judul ? $app_setting->sub_judul : 'Sistem Informasi Katalog Arsip dan Naskah TerIntegrasi' }}
-                </small>
-            </div>
-        </div>
-
-        <div class="px-4 mb-3 mt-4" style="color: #475569; font-weight: 700; font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase;">Navigasi Utama</div>
-        
-        <ul class="sidebar-menu">
-            <li><a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}"><i class="fa-solid fa-border-all"></i> Dashboard</a></li>
-            <li><a href="{{ route('kategori.index') }}" class="{{ request()->routeIs('kategori.*') || request()->routeIs('arsip.*') ? 'active' : '' }}"><i class="fa-solid fa-folder-open"></i> Gudang Folder</a></li>
-            
-            @if(Auth::user()->role == 'Admin' || empty(Auth::user()->role))
-            <li>
-                <a href="{{ route('verifikasi.index') }}" class="{{ request()->routeIs('verifikasi.*') ? 'active' : '' }} d-flex align-items-center">
-                    <i class="fa-solid fa-shield-halved"></i> Verifikasi Akses
-                    <span id="badge-verifikasi-global" class="badge badge-danger ml-auto" style="display: none; border-radius: 8px; padding: 5px 8px; font-family: 'Poppins';">0</span>
-                </a>
-            </li>
-            <li><a href="{{ route('pengguna.index') }}" class="{{ request()->routeIs('pengguna.*') ? 'active' : '' }}"><i class="fa-solid fa-users"></i> Manajemen Tim</a></li>
-            <li><a href="{{ route('sampah.index') }}" class="{{ request()->routeIs('sampah.*') ? 'active' : '' }}"><i class="fa-solid fa-trash-can"></i> Kelola Sampah</a></li>
-            
-            <div class="px-4 mb-3 mt-4" style="color: #475569; font-weight: 700; font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase;">Sistem</div>
-            <li><a href="{{ route('riwayat.index') }}" class="{{ request()->routeIs('riwayat.*') ? 'active' : '' }}"><i class="fa-solid fa-clock-rotate-left"></i> Jejak Aktivitas</a></li>
-            <li><a href="{{ route('pengaturan.index') }}" class="{{ request()->routeIs('pengaturan.*') ? 'active' : '' }}"><i class="fa-solid fa-sliders"></i> Pengaturan Utama</a></li>
-            @endif
-        </ul>
-
-        <div class="mt-auto p-4 border-top" style="border-color: rgba(255,255,255,0.05) !important;">
-            <div style="background: rgba(255,255,255,0.03); border-radius: 16px; padding: 15px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05);">
-                <small style="color: #64748b; font-size: 0.65rem; font-weight: 600; display: block; margin-bottom: 2px;">
-                    SEKTOR AKTIF • <span style="color: #fbbf24;">{{ (Auth::user()->role == 'Admin' || empty(Auth::user()->role)) ? 'ADMIN' : 'USER' }}</span>
-                </small>
-                <strong style="color: #C8A35A; font-size: 0.9rem;">{{ Auth::user()->subbagian->nama_subbag ?? 'UMUM' }} ({{ Auth::user()->subbagian->kode_klasifikasi ?? 'XX' }})</strong>
-            </div>
-            
-            <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="btn btn-block" style="background: rgba(225, 29, 72, 0.1); color: #fb7185; border-radius: 12px; font-weight: 600; font-size: 0.9rem; padding: 12px; transition: 0.3s;">
-                <i class="fa-solid fa-right-from-bracket mr-2"></i> Akhiri Sesi
-            </a>
-            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
-        </div>
-    </div>
-
+    @include('layouts.sidebar')
     <div class="main-content">
         
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -197,17 +144,29 @@
             </div>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center mb-4 pt-2">
+        <div class="d-flex justify-content-between align-items-center mb-4 pt-2 flex-wrap" style="gap: 15px;">
             <h5 class="font-weight-bold text-dark mb-0">Brankas Subbagian {{ Auth::user()->subbagian->nama_subbag }}</h5>
             
-            <button class="btn btn-primary-modern" data-toggle="modal" data-target="#modalTambahFolder">
-                <i class="fa-solid fa-folder-plus mr-2"></i> Buat Folder Baru
-            </button>
+            <div class="d-flex align-items-center flex-wrap" style="gap: 15px;">
+                <div class="input-group align-items-center" style="border: 1px solid #cbd5e1; border-radius: 12px; background: #fff; overflow: hidden; height: 42px; width: 250px;">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text bg-white border-0" style="padding-right: 10px; padding-left: 15px;"><i class="fa-solid fa-magnifying-glass" style="color: #94a3b8; font-size: 0.85rem;"></i></span>
+                    </div>
+                    <input type="text" id="searchInput" class="form-control border-0 shadow-none pl-0 bg-white" placeholder="Cari folder..." style="font-family: 'Poppins'; font-size: 0.85rem; height: 100%;">
+                    <div class="input-group-append" id="clearSearchBtn" style="display: none;">
+                        <button type="button" class="input-group-text bg-white border-0 text-danger" style="background: transparent; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary-modern" data-toggle="modal" data-target="#modalTambahFolder">
+                    <i class="fa-solid fa-folder-plus mr-2"></i> Buat Folder Baru
+                </button>
+            </div>
         </div>
 
-        <div class="row">
+        <div class="row" id="folderContainer">
             @forelse($kategoris->sortBy('nama_kategori') as $kategori)
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4 folder-item" data-nama="{{ strtolower($kategori->nama_kategori) }}" data-deskripsi="{{ strtolower($kategori->deskripsi ?? '') }}">
                     <div class="saas-card folder-card p-4 h-100 position-relative" onclick="openFolder(event, '{{ route('arsip.index', $kategori->id) }}')">
                         
                         <div class="dropdown position-absolute" style="top: 20px; right: 20px; z-index: 10;">
@@ -257,9 +216,39 @@
                             <form action="{{ route('kategori.update', $kategori->id) }}" method="POST">
                                 @csrf @method('PUT')
                                 <div class="modal-body">
-                                    <div class="form-group">
-                                        <label class="font-weight-bold text-dark small text-uppercase">Nama Folder / Klasifikasi</label>
-                                        <input type="text" name="nama_kategori" class="form-control form-control-modern" value="{{ $kategori->nama_kategori }}" required>
+                                    @php
+                                        $isLainnya = true;
+                                        $editKode = '';
+                                        $editAngka = '';
+                                        foreach($subbagians as $sb) {
+                                            if ($sb->kode_klasifikasi && str_starts_with($kategori->nama_kategori, $sb->kode_klasifikasi . '.')) {
+                                                $isLainnya = false;
+                                                $editKode = $sb->kode_klasifikasi;
+                                                $editAngka = substr($kategori->nama_kategori, strlen($sb->kode_klasifikasi) + 1);
+                                                break;
+                                            }
+                                        }
+                                        if ($isLainnya) {
+                                            $editKode = 'Lainnya';
+                                        }
+                                    @endphp
+                                    <div class="row">
+                                        <div class="col-md-6 form-group">
+                                            <label class="font-weight-bold text-dark small text-uppercase">Kode Klasifikasi <span class="text-danger">*</span></label>
+                                            <select class="form-control form-control-modern kode-klasifikasi-edit" name="kode_klasifikasi" required>
+                                                <option value="" disabled>-- Pilih Kode --</option>
+                                                @foreach($subbagians as $sb)
+                                                    @if($sb->kode_klasifikasi)
+                                                        <option value="{{ $sb->kode_klasifikasi }}" {{ $editKode == $sb->kode_klasifikasi ? 'selected' : '' }}>{{ $sb->kode_klasifikasi }}</option>
+                                                    @endif
+                                                @endforeach
+                                                <option value="Lainnya" {{ $editKode == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 form-group">
+                                            <label class="font-weight-bold text-dark small text-uppercase">Nama Folder (Angka) <span class="text-danger">*</span></label>
+                                            <input type="number" class="form-control form-control-modern angka-kategori-edit" name="angka_kategori" value="{{ $editAngka }}" placeholder="Contoh: 1" {{ $editKode == 'Lainnya' ? 'disabled' : 'required' }}>
+                                        </div>
                                     </div>
                                     <div class="form-group mb-0">
                                         <label class="font-weight-bold text-dark small text-uppercase">Deskripsi (Opsional)</label>
@@ -275,7 +264,7 @@
                     </div>
                 </div>
             @empty
-                <div class="col-12">
+                <div class="col-12" id="emptyFolderState">
                     <div class="saas-card p-5 text-center">
                         <div style="font-size: 4.5rem; color: #e2e8f0; margin-bottom: 20px;"><i class="fa-solid fa-folder-plus"></i></div>
                         <h4 class="font-weight-bold text-dark">Gudang Folder Masih Kosong</h4>
@@ -286,6 +275,14 @@
                     </div>
                 </div>
             @endforelse
+
+            <div class="col-12" id="emptySearchState" style="display: none;">
+                <div class="saas-card p-5 text-center">
+                    <div style="font-size: 4.5rem; color: #e2e8f0; margin-bottom: 20px;"><i class="fa-solid fa-magnifying-glass-minus"></i></div>
+                    <h4 class="font-weight-bold text-dark">Folder Tidak Ditemukan</h4>
+                    <p style="color: #64748b; max-width: 400px; margin: 0 auto;">Pencarian Anda tidak cocok dengan nama folder atau deskripsi manapun. Silakan coba kata kunci lain.</p>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -301,9 +298,23 @@
             <form action="{{ route('kategori.store') }}" method="POST">
                 @csrf
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label class="font-weight-bold text-dark small text-uppercase">Nama Folder / Klasifikasi <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control form-control-modern" name="nama_kategori" placeholder="Contoh: SK Pengangkatan, Laporan..." required>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="font-weight-bold text-dark small text-uppercase">Kode Klasifikasi <span class="text-danger">*</span></label>
+                            <select class="form-control form-control-modern" name="kode_klasifikasi" id="kode_klasifikasi_tambah" required>
+                                <option value="" disabled selected>-- Pilih Kode --</option>
+                                @foreach($subbagians as $sb)
+                                    @if($sb->kode_klasifikasi)
+                                        <option value="{{ $sb->kode_klasifikasi }}">{{ $sb->kode_klasifikasi }}</option>
+                                    @endif
+                                @endforeach
+                                <option value="Lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="font-weight-bold text-dark small text-uppercase">Nama Folder (Angka) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control form-control-modern" name="angka_kategori" id="angka_kategori_tambah" placeholder="Contoh: 1" required>
+                        </div>
                     </div>
                     <div class="form-group mb-0">
                         <label class="font-weight-bold text-dark small text-uppercase">Deskripsi Singkat (Opsional)</label>
@@ -331,10 +342,92 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+        // Toggle disable untuk tambah folder
+        const selectTambah = document.getElementById('kode_klasifikasi_tambah');
+        const inputAngkaTambah = document.getElementById('angka_kategori_tambah');
+        if (selectTambah) {
+            selectTambah.addEventListener('change', function() {
+                if (this.value === 'Lainnya') {
+                    inputAngkaTambah.disabled = true;
+                    inputAngkaTambah.required = false;
+                    inputAngkaTambah.value = '';
+                } else {
+                    inputAngkaTambah.disabled = false;
+                    inputAngkaTambah.required = true;
+                }
+            });
+        }
+
+        // Toggle disable untuk edit folder (event delegation)
+        document.addEventListener('change', function(e) {
+            if (e.target && e.target.classList.contains('kode-klasifikasi-edit')) {
+                const row = e.target.closest('.row');
+                if(row) {
+                    const inputAngka = row.querySelector('.angka-kategori-edit');
+                    if (inputAngka) {
+                        if (e.target.value === 'Lainnya') {
+                            inputAngka.disabled = true;
+                            inputAngka.required = false;
+                            inputAngka.value = '';
+                        } else {
+                            inputAngka.disabled = false;
+                            inputAngka.required = true;
+                        }
+                    }
+                }
+            }
+        });
+
         const toast = document.getElementById('elegantToast');
         if(toast) {
             setTimeout(() => { toast.classList.add('show'); }, 100);
             setTimeout(() => { tutupToast(); }, 3100); 
+        }
+
+        // Live Search / Client-side Filtering
+        const searchInput = document.getElementById('searchInput');
+        const clearBtn = document.getElementById('clearSearchBtn');
+        const folderItems = document.querySelectorAll('.folder-item');
+        const emptySearchState = document.getElementById('emptySearchState');
+        const emptyFolderState = document.getElementById('emptyFolderState');
+
+        if(searchInput) {
+            searchInput.addEventListener('input', function() {
+                const keyword = this.value.toLowerCase().trim();
+                let hasVisible = false;
+
+                if(keyword.length > 0) {
+                    clearBtn.style.display = 'block';
+                } else {
+                    clearBtn.style.display = 'none';
+                }
+
+                folderItems.forEach(item => {
+                    const nama = item.getAttribute('data-nama');
+                    const deskripsi = item.getAttribute('data-deskripsi');
+
+                    if(nama.includes(keyword) || deskripsi.includes(keyword)) {
+                        item.style.display = '';
+                        hasVisible = true;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+
+                if(folderItems.length > 0) {
+                    if(!hasVisible && keyword.length > 0) {
+                        emptySearchState.style.display = 'block';
+                    } else {
+                        emptySearchState.style.display = 'none';
+                    }
+                }
+            });
+
+            clearBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                searchInput.dispatchEvent(new Event('input'));
+                searchInput.focus();
+            });
         }
     });
 

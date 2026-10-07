@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\RiwayatAktivitas; 
+use App\RiwayatAktivitas;
+use App\Subbagian;
 
 class PengaturanController extends Controller
 {
@@ -16,12 +17,24 @@ class PengaturanController extends Controller
         $this->middleware('auth');
     }
 
-    // 1. Tampilkan Halaman Pengaturan & Profil
+    // 1. Tampilkan Halaman Pengaturan (Hanya Superadmin)
     public function index()
     {
         // Ambil data pengaturan pertama, jika belum ada di database, buat instansiasi kosong
         $pengaturan = Pengaturan::first() ?? new Pengaturan();
-        return view('pengaturan.index', compact('pengaturan'));
+        
+        $subbagians = collect();
+        if (Auth::user()->role == 'Superadmin') {
+            $subbagians = Subbagian::all();
+        }
+
+        return view('pengaturan.index', compact('pengaturan', 'subbagians'));
+    }
+
+    // Tampilkan Halaman Profil (Untuk Semua)
+    public function profilIndex()
+    {
+        return view('pengaturan.profil');
     }
 
     // 2. Simpan Pembaruan Identitas Instansi (Kiri)

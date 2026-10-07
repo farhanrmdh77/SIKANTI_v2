@@ -7,6 +7,10 @@ use App\Kategori;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Imports\ArsipImport;
+use App\Exports\ArsipTemplateExport;
+use App\Exports\ArsipExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ArsipController extends Controller
 {
@@ -279,5 +283,64 @@ class ArsipController extends Controller
         $nama_file = 'Laporan_Arsip_' . \Str::slug($kategori->nama_kategori) . '_' . date('Ymd_His') . '.pdf';
         
         return $pdf->download($nama_file);
+    }
+
+    public function exportExcel(Request $request, $kategori_id)
+    {
+        $kategori = Kategori::where('subbag_id', Auth::user()->subbag_id)->findOrFail($kategori_id);
+        
+        $arsips = Arsip::where('kategori_id', $kategori_id)->latest();
+
+        if ($request->filled('search')) {
+            $arsips->where(function($q) use ($request) {
+                $q->where('nama_arsip', 'like', '%' . $request->search . '%')
+                ->orWhere('nomor_dokumen', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        if ($request->filled('status_file')) {
+            if ($request->status_file == 'ada') {
+                $arsips->whereNotNull('file_dokumen');
+            } elseif ($request->status_file == 'tidak') {
+                $arsips->whereNull('file_dokumen');
+            }
+        }
+
+        if ($request->filled('lokasi_fisik')) {
+            $arsips->where('lokasi_fisik', $request->lokasi_fisik);
+        }
+
+        $arsips = $arsips->get();
+
+        if ($request->filled('status_jra')) {
+            $arsips = $arsips->filter(function($arsip) use ($request) {
+                return $arsip->status_retensi == $request->status_jra;
+            });
+        }
+
+        $nama_file = 'Laporan_Arsip_' . \Str::slug($kategori->nama_kategori) . '_' . date('Ymd_His') . '.xlsx';
+        
+        return Excel::download(new ArsipExport($arsips, $kategori), $nama_file);
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(new ArsipTemplateExport, 'Template_Import_Arsip.xlsx');
+    }
+
+    public function importExcel(Request $request, $kategori_id)
+    {
+        $request->validate([
+            'file_excel' => 'required|file'
+        ]);
+
+        $kategori = Kategori::where('subbag_id', Auth::user()->subbag_id)->findOrFail($kategori_id);
+
+        try {
+            Excel::import(new ArsipImport($kategori->id, Auth::user()->subbag_id, Auth::id()), $request->file('file_excel'));
+            return back()->with('success', 'Data arsip berhasil diimpor!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal mengimpor data: ' . $e->getMessage());
+        }
     }
 }

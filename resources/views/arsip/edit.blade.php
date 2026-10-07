@@ -63,6 +63,13 @@
     .file-upload-wrapper:hover .file-icon-large { color: #3b82f6; transform: translateY(-5px); }
     .file-upload-text { font-size: 0.9rem; color: #475569; font-weight: 600; margin-bottom: 5px; }
 
+    /* Custom Month Picker */
+    .mp-month-btn { background: transparent; border: 1px solid transparent; border-radius: 8px; color: #475569; padding: 8px 0; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; width: 100%; cursor: pointer; margin-bottom: 5px; }
+    .mp-month-btn:hover { background: #f1f5f9; color: #0f172a; }
+    .mp-month-btn.active { background: #2563eb; color: #fff; font-weight: 600; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2); }
+    .mp-year-btn { border: none; background: #f1f5f9; color: #475569; border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; padding: 0; }
+    .mp-year-btn:hover { background: #e2e8f0; color: #0f172a; }
+
     /* RESPONSIVE */
     .mobile-menu-btn { display: none; background: transparent; border: none; color: #0f172a; font-size: 1.5rem; cursor: pointer; padding: 0; margin-right: 15px; transition: 0.3s; }
     .mobile-menu-btn:hover { color: #2563eb; }
@@ -81,67 +88,7 @@
 </style>
 
 <div class="dashboard-wrapper">
-    <!-- ================================================================ -->
-    <!-- BLOK SIDEBAR TERKUNCI (KONSISTEN) -->
-    <!-- ================================================================ -->
-    <div class="sidebar">
-        <!-- HEADER SIDEBAR -->
-        <div class="sidebar-header d-flex align-items-center">
-            @if(isset($app_setting) && $app_setting->logo_aplikasi)
-                <img src="{{ asset('storage/pengaturan/' . $app_setting->logo_aplikasi) }}" alt="Logo" class="mr-3" style="width: 48px; height: 48px; object-fit: contain; background: transparent; filter: drop-shadow(0 0 12px rgba(96, 165, 250, 0.7));">
-            @else
-                <div class="bg-primary text-white mr-3 shadow-lg" style="width: 48px; height: 48px; font-size: 1.2rem; border-radius: 14px; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-boxes-stacked"></i></div>
-            @endif
-            
-            <div>
-                <h5 class="mb-0 font-weight-bold" style="font-size: 1.15rem; letter-spacing: 0.5px; background: linear-gradient(to right, #60a5fa, #ffffff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(96, 165, 250, 0.1);">
-                    {{ isset($app_setting) ? $app_setting->nama_aplikasi : 'SIKANTI' }}
-                </h5>
-                <small style="color: #94a3b8; font-size: 0.6rem; display: block; line-height: 1.3; margin-top: 2px; font-weight: 500; letter-spacing: 0.5px;">
-                    {{ isset($app_setting) && $app_setting->sub_judul ? $app_setting->sub_judul : 'Sistem Informasi Katalog Arsip dan Naskah TerIntegrasi' }}
-                </small>
-            </div>
-        </div>
-
-        <!-- NAVIGASI UTAMA DENGAN MARGIN/PADDING YANG DISELARASKAN -->
-        <div class="px-4 mb-3 mt-4" style="color: #475569; font-weight: 700; font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase;">Navigasi Utama</div>
-        
-        <ul class="sidebar-menu">
-            <li><a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}"><i class="fa-solid fa-border-all"></i> Dashboard</a></li>
-            <li><a href="{{ route('kategori.index') }}" class="{{ request()->routeIs('kategori.*') || request()->routeIs('arsip.*') ? 'active' : '' }}"><i class="fa-solid fa-folder-open"></i> Gudang Folder</a></li>
-            
-            @if(Auth::user()->role == 'Admin' || empty(Auth::user()->role))
-            <li>
-                <a href="{{ route('verifikasi.index') }}" class="{{ request()->routeIs('verifikasi.*') ? 'active' : '' }} d-flex align-items-center">
-                    <i class="fa-solid fa-shield-halved"></i> Verifikasi Akses
-                    <span id="badge-verifikasi-global" class="badge badge-danger ml-auto" style="display: none; border-radius: 8px; padding: 5px 8px; font-family: 'Poppins';">0</span>
-                </a>
-            </li>
-            <li><a href="{{ route('pengguna.index') }}" class="{{ request()->routeIs('pengguna.*') ? 'active' : '' }}"><i class="fa-solid fa-users"></i> Manajemen Tim</a></li>
-            <li><a href="{{ route('sampah.index') }}" class="{{ request()->routeIs('sampah.*') ? 'active' : '' }}"><i class="fa-solid fa-trash-can"></i> Kelola Sampah</a></li>
-            
-            <div class="px-4 mb-3 mt-4" style="color: #475569; font-weight: 700; font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase;">Sistem</div>
-            <li><a href="{{ route('riwayat.index') }}" class="{{ request()->routeIs('riwayat.*') ? 'active' : '' }}"><i class="fa-solid fa-clock-rotate-left"></i> Jejak Aktivitas</a></li>
-            <li><a href="{{ route('pengaturan.index') }}" class="{{ request()->routeIs('pengaturan.*') ? 'active' : '' }}"><i class="fa-solid fa-sliders"></i> Pengaturan Utama</a></li>
-            @endif
-        </ul>
-
-        <!-- FOOTER SIDEBAR DENGAN TOMBOL LOGOUT TERKUNCI -->
-        <div class="mt-auto p-4 border-top" style="border-color: rgba(255,255,255,0.05) !important;">
-            <div style="background: rgba(255,255,255,0.03); border-radius: 16px; padding: 15px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05);">
-                <small style="color: #64748b; font-size: 0.65rem; font-weight: 600; display: block; margin-bottom: 2px;">
-                    SEKTOR AKTIF • <span style="color: #fbbf24;">{{ (Auth::user()->role == 'Admin' || empty(Auth::user()->role)) ? 'ADMIN' : 'USER' }}</span>
-                </small>
-                <strong style="color: #C8A35A; font-size: 0.9rem;">{{ Auth::user()->subbagian->nama_subbag ?? 'UMUM' }} ({{ Auth::user()->subbagian->kode_klasifikasi ?? 'XX' }})</strong>
-            </div>
-            
-            <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="btn btn-block" style="background: rgba(225, 29, 72, 0.1); color: #fb7185; border-radius: 12px; font-weight: 600; font-size: 0.9rem; padding: 12px; transition: 0.3s;">
-                <i class="fa-solid fa-right-from-bracket mr-2"></i> Akhiri Sesi
-            </a>
-            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
-        </div>
-    </div>
-    <!-- ================================================================ -->
+    @include('layouts.sidebar')
 
     <div class="main-content">
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -204,8 +151,60 @@
                             
                             <div class="row">
                                 <div class="col-md-6 form-group">
-                                    <label class="form-label-modern">Tahun Berkas</label>
-                                    <input type="text" class="form-control-modern" name="tahun_berkas" value="{{ $arsip->tahun_berkas }}">
+                                    <label class="form-label-modern">Tahun Berkas <span class="text-danger">*</span></label>
+                                    @php
+                                        $bulan_val = '';
+                                        $tahun_val = '';
+                                        if ($arsip->tahun_berkas) {
+                                            $parts = explode(' ', $arsip->tahun_berkas);
+                                            if (count($parts) == 2) {
+                                                $bulan_val = $parts[0];
+                                                $tahun_val = $parts[1];
+                                            } else {
+                                                $tahun_val = $parts[0];
+                                            }
+                                        }
+                                    @endphp
+                                    <div class="position-relative">
+                                        <!-- Visible Input Button -->
+                                        <div id="custom-mp-toggle" class="form-control-modern d-flex align-items-center justify-content-between" style="cursor: pointer; background-color: #fff; padding: 10px 14px; min-height: 44px; height: auto;">
+                                            <span id="custom-mp-text" class="{{ $arsip->tahun_berkas ? 'text-dark' : 'text-muted' }}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 10px; font-size: 0.85rem;">{{ $arsip->tahun_berkas ?? 'Bulan & Tahun' }}</span>
+                                            <i class="fa-solid fa-calendar-days text-muted flex-shrink-0"></i>
+                                        </div>
+                                        
+                                        <!-- Hidden Dropdown Popover -->
+                                        <div id="custom-mp-popover" class="position-absolute shadow border rounded bg-white p-3 d-none" style="top: 100%; left: 0; right: 0; z-index: 1000; margin-top: 5px; min-width: 250px;">
+                                            <!-- Year Selector Header -->
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <button type="button" class="mp-year-btn" id="mp-prev-year"><i class="fa-solid fa-chevron-left"></i></button>
+                                                <h6 class="mb-0 fw-bold" id="mp-current-year" style="font-weight: bold; margin: 0;">{{ $tahun_val ?: date('Y') }}</h6>
+                                                <button type="button" class="mp-year-btn" id="mp-next-year"><i class="fa-solid fa-chevron-right"></i></button>
+                                            </div>
+                                            
+                                            <!-- Months Grid -->
+                                            <div class="row mb-3" style="margin-left: -5px; margin-right: -5px;">
+                                                <div class="col-3 px-1"><button type="button" class="mp-month-btn {{ $bulan_val == 'Januari' ? 'active' : '' }}" data-month="01">Jan</button></div>
+                                                <div class="col-3 px-1"><button type="button" class="mp-month-btn {{ $bulan_val == 'Februari' ? 'active' : '' }}" data-month="02">Feb</button></div>
+                                                <div class="col-3 px-1"><button type="button" class="mp-month-btn {{ $bulan_val == 'Maret' ? 'active' : '' }}" data-month="03">Mar</button></div>
+                                                <div class="col-3 px-1"><button type="button" class="mp-month-btn {{ $bulan_val == 'April' ? 'active' : '' }}" data-month="04">Apr</button></div>
+                                                <div class="col-3 px-1 mt-2"><button type="button" class="mp-month-btn {{ $bulan_val == 'Mei' ? 'active' : '' }}" data-month="05">Mei</button></div>
+                                                <div class="col-3 px-1 mt-2"><button type="button" class="mp-month-btn {{ $bulan_val == 'Juni' ? 'active' : '' }}" data-month="06">Jun</button></div>
+                                                <div class="col-3 px-1 mt-2"><button type="button" class="mp-month-btn {{ $bulan_val == 'Juli' ? 'active' : '' }}" data-month="07">Jul</button></div>
+                                                <div class="col-3 px-1 mt-2"><button type="button" class="mp-month-btn {{ $bulan_val == 'Agustus' ? 'active' : '' }}" data-month="08">Ags</button></div>
+                                                <div class="col-3 px-1 mt-2"><button type="button" class="mp-month-btn {{ $bulan_val == 'September' ? 'active' : '' }}" data-month="09">Sep</button></div>
+                                                <div class="col-3 px-1 mt-2"><button type="button" class="mp-month-btn {{ $bulan_val == 'Oktober' ? 'active' : '' }}" data-month="10">Okt</button></div>
+                                                <div class="col-3 px-1 mt-2"><button type="button" class="mp-month-btn {{ $bulan_val == 'November' ? 'active' : '' }}" data-month="11">Nov</button></div>
+                                                <div class="col-3 px-1 mt-2"><button type="button" class="mp-month-btn {{ $bulan_val == 'Desember' ? 'active' : '' }}" data-month="12">Des</button></div>
+                                            </div>
+                                            
+                                            <div class="d-flex justify-content-between">
+                                                <button type="button" class="btn btn-sm btn-light" id="mp-clear-btn" style="font-size: 0.8rem; background: #f8f9fa; border: 1px solid #ddd; border-radius: 6px;">Clear Bulan</button>
+                                                <button type="button" class="btn btn-sm btn-primary" id="mp-apply-btn" style="font-size: 0.8rem; background: #2563eb; border: none; border-radius: 6px; color: white;">Terapkan</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <input type="hidden" name="tahun_berkas" id="hidden_tahun_berkas" value="{{ $arsip->tahun_berkas }}">
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label class="form-label-modern">Jumlah (Lembar)</label>
@@ -306,6 +305,95 @@
 </div>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('custom-mp-toggle');
+        const popover = document.getElementById('custom-mp-popover');
+        const displayText = document.getElementById('custom-mp-text');
+        const hiddenInput = document.getElementById('hidden_tahun_berkas');
+        const monthBtns = document.querySelectorAll('.mp-month-btn');
+        const yearPrev = document.getElementById('mp-prev-year');
+        const yearNext = document.getElementById('mp-next-year');
+        const yearDisplay = document.getElementById('mp-current-year');
+        const clearBtn = document.getElementById('mp-clear-btn');
+        const applyBtn = document.getElementById('mp-apply-btn');
+
+        let selectedMonth = '';
+        let activeBtn = document.querySelector('.mp-month-btn.active');
+        if (activeBtn) {
+            selectedMonth = activeBtn.getAttribute('data-month');
+        }
+
+        let selectedYear = parseInt(yearDisplay.textContent) || new Date().getFullYear();
+        let currentViewYear = selectedYear;
+
+        const monthNames = {
+            '01': 'Januari', '02': 'Februari', '03': 'Maret', '04': 'April',
+            '05': 'Mei', '06': 'Juni', '07': 'Juli', '08': 'Agustus',
+            '09': 'September', '10': 'Oktober', '11': 'November', '12': 'Desember'
+        };
+
+        yearDisplay.textContent = currentViewYear;
+
+        toggleBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            popover.classList.toggle('d-none');
+        });
+
+        popover.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        document.addEventListener('click', function() {
+            if (!popover.classList.contains('d-none')) {
+                popover.classList.add('d-none');
+            }
+        });
+
+        yearPrev.addEventListener('click', function() {
+            currentViewYear--;
+            yearDisplay.textContent = currentViewYear;
+        });
+
+        yearNext.addEventListener('click', function() {
+            currentViewYear++;
+            yearDisplay.textContent = currentViewYear;
+        });
+
+        monthBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                monthBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                selectedMonth = this.getAttribute('data-month');
+            });
+        });
+
+        clearBtn.addEventListener('click', function() {
+            monthBtns.forEach(b => b.classList.remove('active'));
+            selectedMonth = '';
+        });
+
+        applyBtn.addEventListener('click', function() {
+            selectedYear = currentViewYear;
+            let displayStr = '';
+            let valStr = '';
+            
+            if (selectedMonth) {
+                const monthName = monthNames[selectedMonth];
+                displayStr = monthName + ' ' + selectedYear;
+                valStr = monthName + ' ' + selectedYear;
+            } else {
+                displayStr = selectedYear.toString();
+                valStr = selectedYear.toString();
+            }
+            
+            displayText.textContent = displayStr;
+            displayText.classList.remove('text-muted');
+            displayText.classList.add('text-dark');
+            hiddenInput.value = valStr;
+            popover.classList.add('d-none');
+        });
+    });
+
     function updateFileName(input, displayId) {
         const display = document.getElementById(displayId);
         if (input.files && input.files.length > 0) {

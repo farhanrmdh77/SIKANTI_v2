@@ -22,6 +22,11 @@ class Arsip extends Model
         return $this->belongsTo(Kategori::class, 'kategori_id');
     }
 
+    public function subbagian()
+    {
+        return $this->belongsTo(Subbagian::class, 'subbag_id');
+    }
+
     // ========================================================
     // LOGIKA ENTERPRISE: AUTO-CALCULATE JRA (BULAN & TAHUN PRESISI)
     // ========================================================

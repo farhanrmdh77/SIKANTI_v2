@@ -15,19 +15,24 @@ class RiwayatController extends Controller
 
     public function index(Request $request)
     {
-        $subbag_id = Auth::user()->subbag_id;
+        // Hapus riwayat yang sudah lebih dari 30 hari untuk mencegah data terlalu menumpuk
+        RiwayatAktivitas::where('created_at', '<', now()->subDays(30))->delete();
 
-        // Ambil riwayat khusus subbagian yang login, urutkan dari yang terbaru
-        $query = RiwayatAktivitas::with('user')
-                    ->where('subbag_id', $subbag_id)
-                    ->latest();
+        $query = RiwayatAktivitas::with('user')->latest();
+
+        // Jika bukan superadmin, batasi hanya riwayat di subbagiannya sendiri
+        if (Auth::user()->role !== 'Superadmin') {
+            $query->where('subbag_id', Auth::user()->subbag_id);
+        }
 
         // Fitur Pencarian Kata Kunci
         if ($request->filled('search')) {
-            $query->where('deskripsi', 'like', '%' . $request->search . '%')
-                  ->orWhereHas('user', function($q) use ($request) {
-                      $q->where('name', 'like', '%' . $request->search . '%');
+            $query->where(function($q) use ($request) {
+                $q->where('deskripsi', 'like', '%' . $request->search . '%')
+                  ->orWhereHas('user', function($userQuery) use ($request) {
+                      $userQuery->where('name', 'like', '%' . $request->search . '%');
                   });
+            });
         }
 
         // Gunakan pagination agar halaman tidak berat jika log sudah mencapai ribuan

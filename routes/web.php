@@ -44,6 +44,9 @@ Route::middleware(['auth'])->group(function () {
     // Route untuk Isi Folder (Arsip) berdasarkan Kategori ID
     Route::get('/kategori/{kategori_id}/arsip', 'ArsipController@index')->name('arsip.index');
     Route::get('/kategori/{kategori_id}/arsip/export-pdf', 'ArsipController@exportPdf')->name('arsip.export_pdf');
+    Route::get('/kategori/{kategori_id}/arsip/export-excel', 'ArsipController@exportExcel')->name('arsip.export_excel');
+    Route::get('/kategori/{kategori_id}/arsip/template', 'ArsipController@downloadTemplate')->name('arsip.template');
+    Route::post('/kategori/{kategori_id}/arsip/import', 'ArsipController@importExcel')->name('arsip.import');
     
     // INI ADALAH ROUTE BARU UNTUK HALAMAN EDIT DAN SHOW YANG DITAMBAHKAN 
     Route::get('/kategori/{kategori_id}/arsip/create', 'ArsipController@create')->name('arsip.create');
@@ -85,8 +88,19 @@ Route::middleware(['auth'])->group(function () {
     // ROUTE RIWAYAT AKTIVITAS
     Route::get('/riwayat-aktivitas', 'RiwayatController@index')->name('riwayat.index');
 
-    // ROUTE PENGATURAN UTAMA
+    // ROUTE PENGATURAN & PROFIL (SEMUA PENGGUNA)
     Route::get('/pengaturan', 'PengaturanController@index')->name('pengaturan.index');
-    Route::post('/pengaturan/update', 'PengaturanController@update')->name('pengaturan.update');
     Route::put('/profil/update', 'PengaturanController@updateProfil')->name('profil.update');
+
+    // ROUTE PENGATURAN UTAMA (KHUSUS SUPERADMIN)
+    Route::middleware(['is_superadmin'])->group(function () {
+        Route::post('/pengaturan/update', 'PengaturanController@update')->name('pengaturan.update');
+        
+        // Manajemen Pengguna (Superadmin)
+        Route::resource('superadmin/users', 'UserController')->names('superadmin.users');
+        
+        // Manajemen Subbagian / Kode Klasifikasi
+        Route::resource('subbagian', 'SubbagianController')->except(['create', 'show', 'edit']);
+    });
+
 });

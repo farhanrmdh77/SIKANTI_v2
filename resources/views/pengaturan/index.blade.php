@@ -118,58 +118,7 @@
 @endif
 
 <div class="dashboard-wrapper">
-    <div class="sidebar">
-        <div class="sidebar-header d-flex align-items-center">
-            @if(isset($app_setting) && $app_setting->logo_aplikasi)
-                <img src="{{ asset('storage/pengaturan/' . $app_setting->logo_aplikasi) }}" alt="Logo" class="mr-3" style="width: 48px; height: 48px; object-fit: contain; background: transparent; filter: drop-shadow(0 0 12px rgba(96, 165, 250, 0.7));">
-            @else
-                <div class="bg-primary text-white mr-3 shadow-lg" style="width: 48px; height: 48px; font-size: 1.2rem; border-radius: 14px; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-boxes-stacked"></i></div>
-            @endif
-            
-            <div>
-                <h5 class="mb-0 font-weight-bold" style="font-size: 1.15rem; letter-spacing: 0.5px; background: linear-gradient(to right, #60a5fa, #ffffff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(96, 165, 250, 0.1);">
-                    {{ isset($app_setting) ? $app_setting->nama_aplikasi : 'SIKANTI' }}
-                </h5>
-                <small style="color: #94a3b8; font-size: 0.6rem; display: block; line-height: 1.3; margin-top: 2px; font-weight: 500; letter-spacing: 0.5px;">
-                    {{ isset($app_setting) && $app_setting->sub_judul ? $app_setting->sub_judul : 'Sistem Informasi Katalog Arsip dan Naskah TerIntegrasi' }}
-                </small>
-            </div>
-        </div>
-
-        <div class="px-4 mb-3 mt-4" style="color: #475569; font-weight: 700; font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase;">Navigasi Utama</div>
-        
-        <ul class="sidebar-menu">
-            <li><a href="{{ route('home') }}"><i class="fa-solid fa-border-all"></i> Dashboard</a></li>
-            <li><a href="{{ route('kategori.index') }}" class="{{ request()->routeIs('kategori.*') || request()->routeIs('arsip.*') ? 'active' : '' }}"><i class="fa-solid fa-folder-open"></i> Gudang Folder</a></li>
-            <li>
-                <a href="{{ route('verifikasi.index') }}" class="d-flex align-items-center">
-                    <i class="fa-solid fa-shield-halved"></i> Verifikasi Akses
-                    <span id="badge-verifikasi-global" class="badge badge-danger ml-auto" style="display: none; border-radius: 8px; padding: 5px 8px; font-family: 'Poppins';">0</span>
-                </a>
-            </li>
-            <li><a href="{{ route('pengguna.index') }}"><i class="fa-solid fa-users"></i> Manajemen Tim</a></li>
-            <li><a href="{{ route('sampah.index') }}"><i class="fa-solid fa-trash-can"></i> Kelola Sampah</a></li>
-            
-            <div class="px-4 mb-3 mt-4" style="color: #475569; font-weight: 700; font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase;">Sistem</div>
-            <li><a href="{{ route('riwayat.index') }}"><i class="fa-solid fa-clock-rotate-left"></i> Jejak Aktivitas</a></li>
-            <li><a href="{{ route('pengaturan.index') }}" class="active"><i class="fa-solid fa-sliders"></i> Pengaturan Utama</a></li>
-        </ul>
-
-        <div class="mt-auto p-4 border-top" style="border-color: rgba(255,255,255,0.05) !important;">
-            <div style="background: rgba(255,255,255,0.03); border-radius: 16px; padding: 15px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05);">
-                <small style="color: #64748b; font-size: 0.65rem; font-weight: 600; display: block; margin-bottom: 2px;">
-                    SEKTOR AKTIF • <span style="color: #fbbf24;">{{ Auth::user()->role == 'Staff' ? 'STAFF' : 'ADMIN' }}</span>
-                </small>
-                <strong style="color: #C8A35A; font-size: 0.9rem;">{{ Auth::user()->subbagian->nama_subbag ?? 'UMUM' }} ({{ Auth::user()->subbagian->kode_klasifikasi ?? 'XX' }})</strong>
-            </div>
-            
-            <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="btn btn-block" style="background: rgba(225, 29, 72, 0.1); color: #fb7185; border-radius: 12px; font-weight: 600; font-size: 0.9rem; padding: 12px; transition: 0.3s;">
-                <i class="fa-solid fa-right-from-bracket mr-2"></i> Akhiri Sesi
-            </a>
-            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
-        </div>
-    </div>
-
+    @include('layouts.sidebar')
     <div class="main-content">
         
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -202,6 +151,7 @@
 
         <div class="row mt-4">
             
+            @if(Auth::user()->role == 'Superadmin')
             <div class="col-lg-7 mb-4">
                 <div class="saas-card d-flex flex-column">
                     <div class="p-4 bg-white" style="border-bottom: 1px solid #f1f5f9;">
@@ -257,8 +207,9 @@
                     </div>
                 </div>
             </div>
+            @endif
 
-            <div class="col-lg-5 mb-4">
+            <div class="{{ Auth::user()->role == 'Superadmin' ? 'col-lg-5' : 'col-lg-12' }} mb-4">
                 <div class="saas-card d-flex flex-column">
                     <div class="p-4 bg-white" style="border-bottom: 1px solid #f1f5f9;">
                         <h5 class="font-weight-bold text-dark mb-1"><i class="fa-solid fa-user-tie text-primary mr-2"></i>Profil Akun Saya</h5>
@@ -330,8 +281,132 @@
             </div>
 
         </div>
+
+        @if(Auth::user()->role == 'Superadmin')
+        <div class="row mt-2">
+            <div class="col-lg-12 mb-4">
+                <div class="saas-card d-flex flex-column">
+                    <div class="p-4 bg-white d-flex flex-column flex-md-row justify-content-between align-items-md-center" style="border-bottom: 1px solid #f1f5f9;">
+                        <div class="mb-3 mb-md-0">
+                            <h5 class="font-weight-bold text-dark mb-1"><i class="fa-solid fa-sitemap text-primary mr-2"></i>Manajemen Subbagian & Kode Klasifikasi</h5>
+                            <p class="text-muted small mb-0" style="font-size: 0.85rem;">Kelola struktur organisasi yang nantinya menjadi pilihan saat mendaftarkan akun baru.</p>
+                        </div>
+                        <button type="button" class="btn btn-primary-modern flex-shrink-0" data-toggle="modal" data-target="#modalTambahSubbag">
+                            <i class="fa-solid fa-plus mr-2"></i> Tambah Subbagian
+                        </button>
+                    </div>
+                    
+                    <div class="p-4 bg-white flex-grow-1">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-borderless">
+                                <thead style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                                    <tr>
+                                        <th class="py-3" style="color: #64748b; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Kode Klasifikasi</th>
+                                        <th class="py-3" style="color: #64748b; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Nama Subbagian</th>
+                                        <th class="py-3 text-center" style="color: #64748b; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($subbagians as $subbag)
+                                    <tr style="border-bottom: 1px solid #f1f5f9; transition: 0.2s;">
+                                        <td class="align-middle">
+                                            <span class="badge badge-light border" style="font-size: 0.85rem; padding: 6px 12px; border-radius: 8px; color: #0f172a; font-family: monospace;">{{ $subbag->kode_klasifikasi }}</span>
+                                        </td>
+                                        <td class="align-middle" style="font-weight: 500; color: #334155;">{{ $subbag->nama_subbag }}</td>
+                                        <td class="align-middle text-center">
+                                            <button class="btn btn-sm btn-light text-primary mx-1" style="border-radius: 8px;" data-toggle="modal" data-target="#modalEditSubbag{{ $subbag->id }}"><i class="fa-solid fa-edit"></i></button>
+                                            <form action="{{ route('subbagian.destroy', $subbag->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus Subbagian ini?');">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-light text-danger mx-1" style="border-radius: 8px;"><i class="fa-solid fa-trash"></i></button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="3" class="text-center py-5 text-muted">
+                                            <div style="font-size: 2rem; color: #cbd5e1; margin-bottom: 10px;"><i class="fa-solid fa-sitemap"></i></div>
+                                            Belum ada subbagian yang terdaftar.
+                                        </td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
     </div>
 </div>
+
+@if(Auth::user()->role == 'Superadmin')
+<!-- Modal Tambah Subbag -->
+<div class="modal fade" id="modalTambahSubbag" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+            <div class="modal-header" style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 20px 25px;">
+                <h5 class="modal-title font-weight-bold" style="color: #0f172a;"><i class="fa-solid fa-plus-circle text-primary mr-2"></i>Tambah Subbagian</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{{ route('subbagian.store') }}" method="POST">
+                @csrf
+                <div class="modal-body p-4">
+                    <div class="form-group mb-3">
+                        <label class="font-weight-bold text-muted small text-uppercase mb-2">Nama Subbagian / Bidang</label>
+                        <input type="text" name="nama_subbag" class="form-control form-control-modern" placeholder="Contoh: Kepegawaian" required>
+                    </div>
+                    <div class="form-group mb-0">
+                        <label class="font-weight-bold text-muted small text-uppercase mb-2">Kode Klasifikasi</label>
+                        <input type="text" name="kode_klasifikasi" class="form-control form-control-modern" placeholder="Contoh: KP" required style="text-transform: uppercase;">
+                        <small class="text-muted d-block mt-2">Kode klasifikasi akan menjadi identitas depan nomor arsip, e.g., <strong>KP</strong>/001/2026.</small>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light" style="padding: 15px 25px; border-top: 1px solid #e2e8f0;">
+                    <button type="button" class="btn btn-light" data-dismiss="modal" style="border-radius: 10px; font-weight: 500;">Batal</button>
+                    <button type="submit" class="btn btn-primary-modern"><i class="fa-solid fa-save mr-2"></i>Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Edit Subbag -->
+@foreach($subbagians as $subbag)
+<div class="modal fade" id="modalEditSubbag{{ $subbag->id }}" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+            <div class="modal-header" style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 20px 25px;">
+                <h5 class="modal-title font-weight-bold" style="color: #0f172a;"><i class="fa-solid fa-edit text-primary mr-2"></i>Edit Subbagian</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{{ route('subbagian.update', $subbag->id) }}" method="POST">
+                @csrf @method('PUT')
+                <div class="modal-body p-4">
+                    <div class="form-group mb-3">
+                        <label class="font-weight-bold text-muted small text-uppercase mb-2">Nama Subbagian / Bidang</label>
+                        <input type="text" name="nama_subbag" class="form-control form-control-modern" value="{{ $subbag->nama_subbag }}" required>
+                    </div>
+                    <div class="form-group mb-0">
+                        <label class="font-weight-bold text-muted small text-uppercase mb-2">Kode Klasifikasi</label>
+                        <input type="text" name="kode_klasifikasi" class="form-control form-control-modern" value="{{ $subbag->kode_klasifikasi }}" required style="text-transform: uppercase;">
+                    </div>
+                </div>
+                <div class="modal-footer bg-light" style="padding: 15px 25px; border-top: 1px solid #e2e8f0;">
+                    <button type="button" class="btn btn-light" data-dismiss="modal" style="border-radius: 10px; font-weight: 500;">Batal</button>
+                    <button type="submit" class="btn btn-primary-modern"><i class="fa-solid fa-save mr-2"></i>Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endforeach
+@endif
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
