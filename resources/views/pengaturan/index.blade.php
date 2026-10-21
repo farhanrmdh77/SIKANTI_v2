@@ -36,6 +36,7 @@
     .saas-card:hover { box-shadow: 0 15px 45px -10px rgba(15, 23, 42, 0.12); }
     
     .form-control-modern { border-radius: 12px; border: 1px solid #cbd5e1; padding: 12px 16px; font-family: 'Poppins'; color: #334155; transition: 0.3s; background: #f8fafc; font-size: 0.95rem; width: 100%; box-sizing: border-box;}
+    select.form-control-modern { height: auto !important; }
     .form-control-modern:focus { border-color: #2563eb; background: #fff; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15); outline: none; }
     
     .input-group-text.modern { background: #f1f5f9; border: 1px solid #cbd5e1; border-right: none; border-radius: 12px 0 0 12px; color: #94a3b8; transition: 0.3s; }
@@ -303,7 +304,7 @@
                                     <tr>
                                         <th class="py-3" style="color: #64748b; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Kode Klasifikasi</th>
                                         <th class="py-3" style="color: #64748b; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Nama Subbagian</th>
-                                        <th class="py-3 text-center" style="color: #64748b; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Aksi</th>
+                                        <th class="py-3 text-center" style="color: #64748b; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; width: 120px; white-space: nowrap;">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -313,12 +314,18 @@
                                             <span class="badge badge-light border" style="font-size: 0.85rem; padding: 6px 12px; border-radius: 8px; color: #0f172a; font-family: monospace;">{{ $subbag->kode_klasifikasi }}</span>
                                         </td>
                                         <td class="align-middle" style="font-weight: 500; color: #334155;">{{ $subbag->nama_subbag }}</td>
-                                        <td class="align-middle text-center">
-                                            <button class="btn btn-sm btn-light text-primary mx-1" style="border-radius: 8px;" data-toggle="modal" data-target="#modalEditSubbag{{ $subbag->id }}"><i class="fa-solid fa-edit"></i></button>
-                                            <form action="{{ route('subbagian.destroy', $subbag->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus Subbagian ini?');">
-                                                @csrf @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-light text-danger mx-1" style="border-radius: 8px;"><i class="fa-solid fa-trash"></i></button>
-                                            </form>
+                                        <td class="align-middle text-center" style="white-space: nowrap; width: 120px;">
+                                            <div class="d-inline-flex align-items-center justify-content-center" style="gap: 8px;">
+                                                <button class="btn btn-sm btn-light text-primary" style="border-radius: 8px; width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0;" data-toggle="modal" data-target="#modalEditSubbag{{ $subbag->id }}" title="Edit Subbagian">
+                                                    <i class="fa-solid fa-edit"></i>
+                                                </button>
+                                                <form action="{{ route('subbagian.destroy', $subbag->id) }}" method="POST" class="d-inline m-0 p-0" onsubmit="return confirm('Apakah Anda yakin ingin menghapus Subbagian ini?');">
+                                                    @csrf @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-light text-danger" style="border-radius: 8px; width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0;" title="Hapus Subbagian">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                     @empty
@@ -356,12 +363,24 @@
                 @csrf
                 <div class="modal-body p-4">
                     <div class="form-group mb-3">
-                        <label class="font-weight-bold text-muted small text-uppercase mb-2">Nama Subbagian / Bidang</label>
-                        <input type="text" name="nama_subbag" class="form-control form-control-modern" placeholder="Contoh: Kepegawaian" required>
+                        <label class="font-weight-bold text-muted small text-uppercase mb-2">Nama Subbagian / Bidang <span class="text-danger">*</span></label>
+                        <select name="nama_subbag" id="select_subbag_tambah" class="form-control form-control-modern" onchange="pilihSubbagTambah(this)" required>
+                            <option value="" disabled selected>-- Pilih Subbagian / Bidang --</option>
+                            <option value="SDM" data-kode="KP">SDM</option>
+                            <option value="Keuangan" data-kode="KU">Keuangan</option>
+                            <option value="Hukum" data-kode="HK">Hukum</option>
+                            <option value="Humas dan TU Kalan" data-kode="HM">Humas dan TU Kalan</option>
+                            <option value="Umum & IT" data-kode="UM">Umum & IT</option>
+                            <option value="Pemeriksa" data-kode="PM">Pemeriksa</option>
+                            <option value="Lainnya" data-kode="">Lainnya</option>
+                        </select>
+                        <div id="wrapper_custom_tambah" class="mt-2" style="display: none;">
+                            <input type="text" name="nama_subbag_custom" id="custom_subbag_tambah" class="form-control form-control-modern" placeholder="Ketik nama subbagian lainnya...">
+                        </div>
                     </div>
                     <div class="form-group mb-0">
-                        <label class="font-weight-bold text-muted small text-uppercase mb-2">Kode Klasifikasi</label>
-                        <input type="text" name="kode_klasifikasi" class="form-control form-control-modern" placeholder="Contoh: KP" required style="text-transform: uppercase;">
+                        <label class="font-weight-bold text-muted small text-uppercase mb-2">Kode Klasifikasi <span class="text-danger">*</span></label>
+                        <input type="text" name="kode_klasifikasi" id="kode_klasifikasi_tambah" class="form-control form-control-modern" placeholder="Contoh: KP" required style="text-transform: uppercase;">
                         <small class="text-muted d-block mt-2">Kode klasifikasi akan menjadi identitas depan nomor arsip, e.g., <strong>KP</strong>/001/2026.</small>
                     </div>
                 </div>
@@ -376,6 +395,10 @@
 
 <!-- Modal Edit Subbag -->
 @foreach($subbagians as $subbag)
+@php
+    $daftarSubbag = ['SDM', 'Keuangan', 'Hukum', 'Humas dan TU Kalan', 'Umum & IT', 'Pemeriksa'];
+    $isCustom = !in_array($subbag->nama_subbag, $daftarSubbag);
+@endphp
 <div class="modal fade" id="modalEditSubbag{{ $subbag->id }}" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
@@ -389,11 +412,20 @@
                 @csrf @method('PUT')
                 <div class="modal-body p-4">
                     <div class="form-group mb-3">
-                        <label class="font-weight-bold text-muted small text-uppercase mb-2">Nama Subbagian / Bidang</label>
-                        <input type="text" name="nama_subbag" class="form-control form-control-modern" value="{{ $subbag->nama_subbag }}" required>
+                        <label class="font-weight-bold text-muted small text-uppercase mb-2">Nama Subbagian / Bidang <span class="text-danger">*</span></label>
+                        <select name="nama_subbag" class="form-control form-control-modern" onchange="pilihSubbagEdit(this, '{{ $subbag->id }}')" required>
+                            <option value="" disabled>-- Pilih Subbagian / Bidang --</option>
+                            @foreach($daftarSubbag as $sbName)
+                                <option value="{{ $sbName }}" {{ $subbag->nama_subbag == $sbName ? 'selected' : '' }}>{{ $sbName }}</option>
+                            @endforeach
+                            <option value="Lainnya" {{ $isCustom ? 'selected' : '' }}>Lainnya</option>
+                        </select>
+                        <div id="wrapper_custom_edit_{{ $subbag->id }}" class="mt-2" style="{{ $isCustom ? '' : 'display: none;' }}">
+                            <input type="text" name="nama_subbag_custom" id="custom_subbag_edit_{{ $subbag->id }}" class="form-control form-control-modern" value="{{ $isCustom ? $subbag->nama_subbag : '' }}" placeholder="Ketik nama subbagian...">
+                        </div>
                     </div>
                     <div class="form-group mb-0">
-                        <label class="font-weight-bold text-muted small text-uppercase mb-2">Kode Klasifikasi</label>
+                        <label class="font-weight-bold text-muted small text-uppercase mb-2">Kode Klasifikasi <span class="text-danger">*</span></label>
                         <input type="text" name="kode_klasifikasi" class="form-control form-control-modern" value="{{ $subbag->kode_klasifikasi }}" required style="text-transform: uppercase;">
                     </div>
                 </div>
@@ -413,6 +445,47 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    // ========================================================
+    // LOGIKA DROPDOWN SUBBAGIAN & KODE KLASIFIKASI
+    // ========================================================
+    function pilihSubbagTambah(selectEl) {
+        const wrapper = document.getElementById('wrapper_custom_tambah');
+        const customInput = document.getElementById('custom_subbag_tambah');
+        const kodeInput = document.getElementById('kode_klasifikasi_tambah');
+        const selectedOption = selectEl.options[selectEl.selectedIndex];
+
+        if (selectEl.value === 'Lainnya') {
+            wrapper.style.display = 'block';
+            customInput.required = true;
+            customInput.focus();
+        } else {
+            wrapper.style.display = 'none';
+            customInput.required = false;
+            customInput.value = '';
+            
+            // Auto-fill kode klasifikasi jika tersedia
+            const autoKode = selectedOption.getAttribute('data-kode');
+            if (autoKode && kodeInput) {
+                kodeInput.value = autoKode;
+            }
+        }
+    }
+
+    function pilihSubbagEdit(selectEl, id) {
+        const wrapper = document.getElementById('wrapper_custom_edit_' + id);
+        const customInput = document.getElementById('custom_subbag_edit_' + id);
+
+        if (selectEl.value === 'Lainnya') {
+            wrapper.style.display = 'block';
+            customInput.required = true;
+            customInput.focus();
+        } else {
+            wrapper.style.display = 'none';
+            customInput.required = false;
+            customInput.value = '';
+        }
+    }
+
     // ========================================================
     // LOGIKA SIDEBAR MOBILE
     // ========================================================

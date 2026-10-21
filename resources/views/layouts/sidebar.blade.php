@@ -48,18 +48,19 @@
     </ul>
 
     <div class="mt-auto p-4 border-top" style="border-color: rgba(255,255,255,0.05) !important;">
-        @if(Auth::user()->role !== 'Superadmin')
-        <div style="background: rgba(255,255,255,0.03); border-radius: 16px; padding: 15px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05);">
-            <small style="color: #64748b; font-size: 0.65rem; font-weight: 600; display: block; margin-bottom: 2px;">
-                SEKTOR AKTIF • <span style="color: #fbbf24;">{{ Auth::user()->role ? strtoupper(Auth::user()->role) : 'USER' }}</span>
-            </small>
-            <strong style="color: #C8A35A; font-size: 0.9rem;">{{ Auth::user()->subbagian->nama_subbag ?? 'UMUM' }} ({{ Auth::user()->subbagian->kode_klasifikasi ?? 'XX' }})</strong>
-        </div>
-        @endif
-        
         <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="btn btn-block" style="background: rgba(225, 29, 72, 0.1); color: #fb7185; border-radius: 12px; font-weight: 600; font-size: 0.9rem; padding: 12px; transition: 0.3s;">
             <i class="fa-solid fa-right-from-bracket mr-2"></i> Akhiri Sesi
         </a>
         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
+
+        <!-- FOOTER DEVELOPER (TERSEMBUNYI / ELEGAN) -->
+        <div class="text-center mt-3 pt-2" style="border-top: 1px solid rgba(255,255,255,0.05); opacity: 0.35; transition: all 0.3s ease; cursor: default;" onmouseover="this.style.opacity='0.95'" onmouseout="this.style.opacity='0.35'" title="SIKANTI E-Arsip Platform">
+            <div style="font-size: 0.65rem; color: #94a3b8; font-weight: 500; letter-spacing: 0.3px;">
+                &copy; {{ date('Y') }} SIKANTI • BPK Jambi
+            </div>
+            <div style="font-size: 0.65rem; color: #64748b; margin-top: 2px;">
+                Developed by <span style="color: #38bdf8; font-weight: 600;">Farhan</span>
+            </div>
+        </div>
     </div>
 </div>

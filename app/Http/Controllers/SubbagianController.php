@@ -40,6 +40,10 @@ class SubbagianController extends Controller
      */
     public function store(Request $request)
     {
+        if ($request->nama_subbag === 'Lainnya' && $request->filled('nama_subbag_custom')) {
+            $request->merge(['nama_subbag' => $request->nama_subbag_custom]);
+        }
+
         $request->validate([
             'nama_subbag' => 'required|string|max:255',
             'kode_klasifikasi' => 'required|string|max:50|unique:subbagians,kode_klasifikasi',
@@ -63,6 +67,10 @@ class SubbagianController extends Controller
     public function update(Request $request, $id)
     {
         $subbagian = \App\Subbagian::findOrFail($id);
+
+        if ($request->nama_subbag === 'Lainnya' && $request->filled('nama_subbag_custom')) {
+            $request->merge(['nama_subbag' => $request->nama_subbag_custom]);
+        }
 
         $request->validate([
             'nama_subbag' => 'required|string|max:255',

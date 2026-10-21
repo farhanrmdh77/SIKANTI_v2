@@ -32,7 +32,54 @@
     .top-navbar-sticky { position: sticky; top: 0; background-color: rgba(244, 247, 251, 0.85); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); z-index: 999; margin: 0 -40px 30px -40px; padding: 20px 40px; border-bottom: 1px solid rgba(226, 232, 240, 0.8); box-shadow: 0 4px 10px -2px rgba(0, 0, 0, 0.02); }
 
     /* ================= SAAS COMPONENTS ================= */
-    .saas-card { background: #fff; border: 1px solid rgba(226, 232, 240, 0.8); border-radius: 20px; box-shadow: 0 10px 40px -10px rgba(15, 23, 42, 0.08); overflow: hidden; position: relative; }
+    .saas-card { background: #fff; border: 1px solid rgba(226, 232, 240, 0.8); border-radius: 20px; box-shadow: 0 10px 40px -10px rgba(15, 23, 42, 0.08); overflow: visible; position: relative; }
+    
+    /* DROPDOWN EKSPOR / UNDUH MODERN */
+    .dropdown-menu-export {
+        display: none;
+        position: absolute;
+        top: calc(100% + 6px);
+        right: 0;
+        left: auto;
+        background: #ffffff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 15px 35px -5px rgba(15, 23, 42, 0.15), 0 5px 15px rgba(0,0,0,0.05);
+        padding: 8px;
+        min-width: 175px;
+        z-index: 1050;
+    }
+    .dropdown-menu-export.show {
+        display: block !important;
+        animation: fadeInDropdown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes fadeInDropdown {
+        from { opacity: 0; transform: translateY(-6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .dropdown-menu-export .dropdown-item {
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #334155;
+        padding: 9px 14px;
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+    .dropdown-menu-export .dropdown-item:hover {
+        background-color: #f8fafc;
+        transform: translateX(3px);
+    }
+    .dropdown-menu-export .dropdown-item.item-pdf:hover {
+        background-color: #fef2f2;
+        color: #ef4444;
+    }
+    .dropdown-menu-export .dropdown-item.item-excel:hover {
+        background-color: #f0fdf4;
+        color: #16a34a;
+    }
     
     .btn-primary-modern { background-color: #2563eb; color: #fff; border: none; border-radius: 10px; font-weight: 600; padding: 10px 18px; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); transition: 0.3s; display: inline-flex; align-items: center; }
     .btn-primary-modern:hover { background-color: #1d4ed8; color: #fff; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3); }
@@ -225,13 +272,13 @@
 
         <div class="saas-card mb-5">
             
-            <div class="d-flex justify-content-between align-items-center px-4 py-3 bg-white flex-wrap" style="border-bottom: 1px solid #f1f5f9;">
+            <div class="d-flex justify-content-between align-items-center px-4 py-3 bg-white flex-wrap" style="border-bottom: 1px solid #f1f5f9; border-radius: 20px 20px 0 0;">
                 <div class="w-100 mb-4">
                     <h5 class="font-weight-bold mb-0" style="color: #1e293b; font-size: 1.1rem;">Daftar Berkas Terdaftar</h5>
                     <p class="mb-0 mt-1" style="color: #64748b; font-size: 0.85rem;" id="tableDescription">Kelola dokumen di dalam folder klasifikasi ini secara detail.</p>
                 </div>
                 
-                <div class="d-flex align-items-center flex-wrap" style="gap: 15px;">
+                <div class="d-flex align-items-center flex-wrap" style="gap: 12px;">
                     <button type="button" id="btnToggleMode" class="btn btn-secondary border-0 btn-sm font-weight-bold shadow-sm" style="border-radius: 8px; color: #ffffff; padding: 8px 15px; font-size: 0.85rem; white-space: nowrap;" onclick="toggleSelectionMode()">
                         <i class="fa-solid fa-list-check mr-1"></i> Pilih Massal
                     </button>
@@ -240,13 +287,20 @@
                         <i class="fa-solid fa-trash-can mr-1"></i> Hapus (<span id="countTerpilih">0</span>)
                     </button>
                     
-                    <a href="{{ route('arsip.export_pdf', array_merge(['kategori_id' => $kategori->id], request()->query())) }}" class="btn btn-sm shadow-sm" style="background-color: #ef4444; color: #ffffff; border-radius: 8px; padding: 8px 15px; font-size: 0.85rem; font-weight: 600; white-space: nowrap; text-decoration: none; border: none; transition: 0.3s;" onmouseover="this.style.backgroundColor='#dc2626'; this.style.transform='translateY(-2px)'" onmouseout="this.style.backgroundColor='#ef4444'; this.style.transform='translateY(0)'">
-                        <i class="fa-solid fa-file-pdf mr-1"></i> Unduh PDF
-                    </a>
-
-                    <a href="{{ route('arsip.export_excel', array_merge(['kategori_id' => $kategori->id], request()->query())) }}" class="btn btn-sm shadow-sm" style="background-color: #22c55e; color: #ffffff; border-radius: 8px; padding: 8px 15px; font-size: 0.85rem; font-weight: 600; white-space: nowrap; text-decoration: none; border: none; transition: 0.3s;" onmouseover="this.style.backgroundColor='#16a34a'; this.style.transform='translateY(-2px)'" onmouseout="this.style.backgroundColor='#22c55e'; this.style.transform='translateY(0)'">
-                        <i class="fa-solid fa-file-excel mr-1"></i> Unduh Excel
-                    </a>
+                    <!-- DROPDOWN UNDUH BERKAS -->
+                    <div class="dropdown d-inline-block" id="dropdownUnduhWrapper" style="position: relative;">
+                        <button type="button" class="btn btn-sm shadow-sm font-weight-bold" id="btnDropdownUnduh" onclick="toggleDropdownUnduh(event)" style="background-color: #059669; color: #ffffff; border-radius: 8px; padding: 8px 15px; font-size: 0.85rem; font-weight: 600; white-space: nowrap; border: none; transition: 0.3s; display: inline-flex; align-items: center;" onmouseover="this.style.backgroundColor='#047857'; this.style.transform='translateY(-2px)'" onmouseout="this.style.backgroundColor='#059669'; this.style.transform='translateY(0)'">
+                            <i class="fa-solid fa-download mr-1"></i> Unduh <i class="fa-solid fa-chevron-down ml-2" style="font-size: 0.75rem;"></i>
+                        </button>
+                        <div class="dropdown-menu-export" id="dropdownMenuUnduhList">
+                            <a class="dropdown-item item-pdf" href="{{ route('arsip.export_pdf', array_merge(['kategori_id' => $kategori->id], request()->query())) }}">
+                                <i class="fa-solid fa-file-pdf mr-2" style="color: #ef4444; font-size: 1.1rem; width: 22px; text-align: center;"></i> Unduh PDF
+                            </a>
+                            <a class="dropdown-item item-excel mt-1" href="{{ route('arsip.export_excel', array_merge(['kategori_id' => $kategori->id], request()->query())) }}">
+                                <i class="fa-solid fa-file-excel mr-2" style="color: #16a34a; font-size: 1.1rem; width: 22px; text-align: center;"></i> Unduh Excel
+                            </a>
+                        </div>
+                    </div>
 
                     <button type="button" class="btn btn-sm shadow-sm" style="background-color: #3b82f6; color: #ffffff; border-radius: 8px; padding: 8px 15px; font-size: 0.85rem; font-weight: 600; white-space: nowrap; text-decoration: none; border: none; transition: 0.3s;" onmouseover="this.style.backgroundColor='#2563eb'; this.style.transform='translateY(-2px)'" onmouseout="this.style.backgroundColor='#3b82f6'; this.style.transform='translateY(0)'" data-toggle="modal" data-target="#importExcelModal">
                         <i class="fa-solid fa-upload mr-1"></i> Import Excel
@@ -592,6 +646,26 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    // LOGIKA DROPDOWN UNDUH BERKAS (INDEPENDEN & CEPAT)
+    function toggleDropdownUnduh(event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        const menu = document.getElementById('dropdownMenuUnduhList');
+        if (menu) {
+            menu.classList.toggle('show');
+        }
+    }
+
+    document.addEventListener('click', function(event) {
+        const wrapper = document.getElementById('dropdownUnduhWrapper');
+        const menu = document.getElementById('dropdownMenuUnduhList');
+        if (wrapper && menu && !wrapper.contains(event.target)) {
+            menu.classList.remove('show');
+        }
+    });
+
     // LOGIKA FILE UPLOAD MODERN
     function updateFileName(input, displayId) {
         const display = document.getElementById(displayId);

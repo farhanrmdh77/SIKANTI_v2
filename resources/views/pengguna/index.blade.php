@@ -193,7 +193,7 @@
                             <th width="35%">IDENTITAS PENGGUNA</th>
                             <th width="30%">ALAMAT EMAIL (USERNAME)</th>
                             <th width="15%" class="text-center">HAK AKSES</th>
-                            <th width="15%" class="text-center">AKSI</th>
+                            <th width="15%" class="text-center" style="white-space: nowrap;">AKSI</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -232,13 +232,13 @@
                                         <span class="badge-modern badge-gray"><i class="fa-solid fa-user-pen mr-1"></i> Staff Registrasi</span>
                                     @endif
                                 </td>
-                                <td class="text-center">
-                                    <div class="d-flex justify-content-center">
+                                <td class="text-center align-middle" style="white-space: nowrap; width: 120px;">
+                                    <div class="d-inline-flex align-items-center justify-content-center" style="gap: 6px;">
                                         <button class="action-btn-circle btn-edit" title="Edit Akun" data-toggle="modal" data-target="#modalEditUser{{ $user->id }}">
                                             <i class="fa-solid fa-pen"></i>
                                         </button>
                                         @if($user->id != Auth::user()->id)
-                                            <form id="form-hapus-pengguna-{{ $user->id }}" action="{{ route('pengguna.destroy', $user->id) }}" method="POST" class="d-inline m-0">
+                                            <form id="form-hapus-pengguna-{{ $user->id }}" action="{{ route('pengguna.destroy', $user->id) }}" method="POST" class="d-inline m-0 p-0">
                                                 @csrf @method('DELETE')
                                                 <button type="button" class="action-btn-circle btn-delete" title="Hapus Akun" onclick="konfirmasiHapusPengguna({{ $user->id }})">
                                                     <i class="fa-solid fa-trash-can"></i>

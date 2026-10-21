@@ -152,7 +152,7 @@
                                         <th class="py-3" style="color: #64748b; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Email</th>
                                         <th class="py-3" style="color: #64748b; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Role</th>
                                         <th class="py-3" style="color: #64748b; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Subbagian (Kode)</th>
-                                        <th class="py-3 text-center" style="color: #64748b; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Aksi</th>
+                                        <th class="py-3 text-center" style="color: #64748b; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; width: 120px; white-space: nowrap;">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -182,12 +182,18 @@
                                             <span style="font-weight: 500; color: #334155;">{{ $u->subbagian->nama_subbag ?? '-' }}</span><br>
                                             <small class="text-muted"><i class="fa-solid fa-tag mr-1 text-primary"></i>{{ $u->subbagian->kode_klasifikasi ?? '-' }}</small>
                                         </td>
-                                        <td class="align-middle text-center">
-                                            <button class="btn btn-sm btn-light text-primary mx-1" style="border-radius: 8px;" data-toggle="modal" data-target="#modalEditUser{{ $u->id }}"><i class="fa-solid fa-edit"></i></button>
-                                            <form action="{{ route('superadmin.users.destroy', $u->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus akun ini?');">
-                                                @csrf @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-light text-danger mx-1" style="border-radius: 8px;"><i class="fa-solid fa-trash"></i></button>
-                                            </form>
+                                        <td class="align-middle text-center" style="white-space: nowrap; width: 120px;">
+                                            <div class="d-inline-flex align-items-center justify-content-center" style="gap: 8px;">
+                                                <button class="btn btn-sm btn-light text-primary" style="border-radius: 8px; width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0;" data-toggle="modal" data-target="#modalEditUser{{ $u->id }}" title="Edit Pengguna">
+                                                    <i class="fa-solid fa-edit"></i>
+                                                </button>
+                                                <form action="{{ route('superadmin.users.destroy', $u->id) }}" method="POST" class="d-inline m-0 p-0" onsubmit="return confirm('Apakah Anda yakin ingin menghapus akun ini?');">
+                                                    @csrf @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-light text-danger" style="border-radius: 8px; width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0;" title="Hapus Pengguna">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                     @empty

@@ -414,13 +414,48 @@
             $chartData = collect($kategoris_chart ?? [])->sortBy('nama_kategori')->values();
         @endphp
 
-        const labelsFolder = [
-            @foreach($chartData as $k) '{{ $k->nama_kategori }}', @endforeach
-        ];
-        
-        const dataJumlah = [
-            @foreach($chartData as $k) {{ $k->arsips_count }}, @endforeach
-        ];
+        const rawLabels = {!! json_encode($chartData->pluck('nama_kategori')) !!};
+        const dataJumlah = {!! json_encode($chartData->pluck('arsips_count')) !!};
+
+        // Fungsi decode HTML entity jika ada text yang ter-escape
+        function decodeHtmlEntities(str) {
+            const txt = document.createElement('textarea');
+            txt.innerHTML = str;
+            return txt.value;
+        }
+
+        // Fungsi cerdas merapikan label agar tidak miring dan pas secara horizontal
+        function wrapLabel(text, maxLineLength = 12) {
+            if (typeof text !== 'string') return text;
+            text = decodeHtmlEntities(text);
+
+            // Penataan rapi khusus "Humas dan TU Kalan"
+            if (text.toLowerCase().includes('humas dan tu kalan')) {
+                return ['Humas dan', 'TU Kalan'];
+            }
+
+            if (text.length <= maxLineLength) return text;
+
+            const words = text.split(' ');
+            if (words.length <= 1) return text;
+
+            const lines = [];
+            let currentLine = '';
+
+            for (const word of words) {
+                if ((currentLine + ' ' + word).trim().length <= maxLineLength) {
+                    currentLine = (currentLine + ' ' + word).trim();
+                } else {
+                    if (currentLine) lines.push(currentLine);
+                    currentLine = word;
+                }
+            }
+            if (currentLine) lines.push(currentLine);
+
+            return lines.length > 1 ? lines : text;
+        }
+
+        const labelsFolder = rawLabels.map(item => wrapLabel(item, 12));
 
         new Chart(ctx, {
             type: 'line',
@@ -444,16 +479,66 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        top: 10,
+                        bottom: 12,
+                        left: 5,
+                        right: 15
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: {
+                            boxWidth: 14,
+                            boxHeight: 14,
+                            borderRadius: 4,
+                            useBorderRadius: true,
+                            font: { family: 'Poppins', weight: '600', size: 12 },
+                            color: '#475569',
+                            padding: 20
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#0f172a',
+                        titleFont: { family: 'Poppins', weight: '600', size: 13 },
+                        bodyFont: { family: 'Poppins', weight: '500', size: 12 },
+                        padding: 12,
+                        cornerRadius: 10,
+                        boxPadding: 6,
+                        callbacks: {
+                            title: function(context) {
+                                if (!context || !context.length) return '';
+                                const raw = rawLabels[context[0].dataIndex];
+                                return raw ? decodeHtmlEntities(raw) : (Array.isArray(context[0].label) ? context[0].label.join(' ') : context[0].label);
+                            }
+                        }
+                    }
+                },
                 scales: {
                     x: {
-                        ticks: { font: { family: 'Poppins', weight: '500', size: 12 }, color: '#94a3b8' },
-                        grid: { display: false } 
+                        grid: { display: false },
+                        border: { color: '#e2e8f0' },
+                        ticks: {
+                            maxRotation: 0,
+                            minRotation: 0,
+                            autoSkip: false,
+                            font: { family: 'Poppins', weight: '600', size: 11 },
+                            color: '#64748b',
+                            padding: 8
+                        }
                     },
                     y: {
                         beginAtZero: true,
-                        ticks: { precision: 0, font: { family: 'Poppins', weight: '500' }, color: '#94a3b8', padding: 10 },
+                        ticks: { 
+                            precision: 0, 
+                            font: { family: 'Poppins', weight: '500', size: 11 }, 
+                            color: '#94a3b8', 
+                            padding: 10 
+                        },
                         border: { display: false },
-                        grid: { color: 'rgba(226, 232, 240, 0.5)', drawBorder: false }
+                        grid: { color: 'rgba(226, 232, 240, 0.6)', drawBorder: false }
                     }
                 }
             }

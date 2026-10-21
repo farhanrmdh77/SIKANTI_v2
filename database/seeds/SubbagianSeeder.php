@@ -35,7 +35,7 @@ class SubbagianSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'nama_subbag' => 'Humas',
+                'nama_subbag' => 'Humas dan TU Kalan',
                 'kode_klasifikasi' => 'HM',
                 'created_at' => now(),
                 'updated_at' => now(),

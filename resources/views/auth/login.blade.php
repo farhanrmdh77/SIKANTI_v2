@@ -311,6 +311,9 @@
                 
                 <div class="text-center mt-4 pt-3 border-top small" style="color: #94a3b8; font-weight: 500; border-color: #f1f5f9 !important; font-size: 0.75rem;">
                     &copy; {{ date('Y') }} BPK Perwakilan Jambi. All rights reserved.
+                    <div class="mt-1" style="font-size: 0.7rem; color: #94a3b8; opacity: 0.45; transition: opacity 0.3s ease;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.45'">
+                        Developed by <span style="color: #2563eb; font-weight: 600;">Farhan</span>
+                    </div>
                 </div>
             </div>
         </div>
