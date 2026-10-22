@@ -52,13 +52,14 @@
                 </div>
                 <div class="form-group">
                     <label class="font-weight-bold text-dark small">ASAL SUBBAGIAN</label>
-                    <select class="form-control" name="subbagian_pemohon" required style="cursor: pointer; appearance: none; background-image: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"%236b7280\" viewBox=\"0 0 16 16\"><path fill-rule=\"evenodd\" d=\"M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z\"/></svg>'); background-repeat: no-repeat; background-position: right 15px center; padding-right: 40px;">
+                    <select class="form-control" name="subbagian_pemohon" required style="cursor: pointer; appearance: none; background-image: url('data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'16\' height=\'16\' fill=\'%236b7280\' viewBox=\'0 0 16 16\'><path fill-rule=\'evenodd\' d=\'M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z\'/></svg>'); background-repeat: no-repeat; background-position: right 15px center; padding-right: 40px;">
                         <option value="" selected disabled>-- Pilih Subbagian --</option>
-                        <option value="SDM">Sumber Daya Manusia (SDM)</option>
+                        <option value="SDM">SDM</option>
                         <option value="Keuangan">Keuangan</option>
-                        <option value="Umum">Umum</option>
                         <option value="Hukum">Hukum</option>
-                        <option value="Humas">Humas & IT</option>
+                        <option value="Humas TU & Kalan">Humas TU & Kalan</option>
+                        <option value="Umum & IT">Umum & IT</option>
+                        <option value="Pemeriksa">Pemeriksa</option>
                     </select>
                 </div>
                 <div class="form-group">
